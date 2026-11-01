@@ -84,9 +84,10 @@ app.get("/files/:slug/*", async (c) => {
 
 // Serve the built web app if present (pnpm --filter @studio/web build).
 const here = path.dirname(fileURLToPath(import.meta.url));
-const webDist = path.relative(process.cwd(), path.resolve(here, "../../../apps/web/dist"));
+// serveStatic wants a relative, forward-slash path (backslashes break it on Windows).
+const webDist = path.relative(process.cwd(), path.resolve(here, "../../../apps/web/dist")).split(path.sep).join("/");
 app.use("/*", serveStatic({ root: webDist }));
-app.get("*", serveStatic({ path: path.join(webDist, "index.html") }));
+app.get("*", serveStatic({ path: `${webDist}/index.html` }));
 
 const port = Number(process.env.PORT ?? 4317);
 serve({ fetch: app.fetch, port }, () => {

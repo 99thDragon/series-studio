@@ -18,7 +18,13 @@ Everything lives in one **production record**: a folder of human-readable files 
 
 ## Quick start
 
-Requires Node 20+ and pnpm.
+Requires [Node.js](https://nodejs.org) 20 or newer. Turn on pnpm, which ships with Node, once:
+
+```bash
+corepack enable pnpm
+```
+
+On Windows, if that fails with a permission error, run `npm install -g pnpm` instead.
 
 ```bash
 pnpm install
