@@ -1,0 +1,21 @@
+# Media never goes in git
+*.mp4
+*.mov
+*.MOV
+*.webm
+*.wav
+*.mp3
+frames/
+renders/
+takes/
+media/
+
+# Secrets
+.env
+.env.*
+
+# Tooling
+node_modules/
+__pycache__/
+.venv/
+.DS_Store
