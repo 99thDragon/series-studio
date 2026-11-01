@@ -4,11 +4,11 @@
   "type": "module",
   "packageManager": "pnpm@10.28.0",
   "scripts": {
+    "start": "tsx packages/server/src/index.ts",
     "studio": "tsx packages/cli/src/index.ts",
     "mcp": "tsx packages/mcp/src/index.ts",
-    "server": "tsx packages/server/src/index.ts",
     "web": "pnpm --filter @studio/web dev",
-    "dev": "concurrently -n api,web \"pnpm server\" \"pnpm web\"",
+    "dev": "concurrently -n api,web \"pnpm start\" \"pnpm web\"",
     "test": "vitest run",
     "typecheck": "tsc -p tsconfig.json --noEmit"
   },

@@ -35,7 +35,7 @@ pnpm studio example
 ```
 
 ```bash
-pnpm --filter @studio/web build && pnpm server
+pnpm --filter @studio/web build && pnpm start
 ```
 
 Open http://localhost:4317. For live-reloading UI development, run `pnpm dev` instead and open http://localhost:5173.
