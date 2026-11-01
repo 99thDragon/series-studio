@@ -1,0 +1,13 @@
+rules:
+  - id: R001
+    text: stage figures in depth; foreground element, subject mid-ground, sea behind
+    scope: series
+    origin: S01E01/SC01-SH01
+    status: adopted
+    createdAt: "2026-11-01T00:00:00.000Z"
+  - id: R002
+    text: never show the lamp from below; it should feel close and warm, not monumental
+    scope: series
+    origin: S01E01/SC02-SH01
+    status: proposed
+    createdAt: "2026-11-01T00:00:00.000Z"

@@ -19,3 +19,7 @@ node_modules/
 __pycache__/
 .venv/
 .DS_Store
+
+# Local production data (version it in its own repo if you like)
+/studio-data/
+dist/

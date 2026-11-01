@@ -1,0 +1,11 @@
+id: mira-oilskin
+name: Mira's oilskin coat
+description: Oversized yellow oilskin, sleeves rolled
+prompt: oversized mustard-yellow oilskin coat with rolled sleeves
+refs:
+  - file: refs/outfit.png
+    kind: outfit
+    label: outfit
+    canonical: true
+rules: []
+owner: mira

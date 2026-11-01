@@ -1,0 +1,55 @@
+scenes:
+  - id: SC01
+    place: lamp-room
+    timeOfDay: dusk
+    summary: Bram leaves Mira in charge
+    shots:
+      - id: SC01-SH01
+        action: Bram presses the brass lantern and a ring of keys into Mira's hands
+        dialogue: Keep it burning. Whatever you hear.
+        camera: medium two-shot, slow push in
+        durationSec: 6
+        cast:
+          - id: mira
+            wardrobe: [mira-oilskin]
+            note: nervous half-smile
+          - id: bram
+        props: [brass-lantern]
+        status: planned
+      - id: SC01-SH02
+        action: Bram descends the spiral stairs; Mira watches from the top
+        camera: high angle looking down the stairwell
+        durationSec: 5
+        cast:
+          - id: mira
+            wardrobe: [mira-oilskin]
+          - id: bram
+        status: planned
+  - id: SC02
+    place: lamp-room
+    timeOfDay: night, storm
+    summary: The lamp gutters
+    shots:
+      - id: SC02-SH01
+        action: Mira's head nods against the glass; behind her the great lamp flickers and dims
+        camera: locked-off medium shot
+        durationSec: 6
+        cast:
+          - id: mira
+            wardrobe: [mira-oilskin]
+        status: planned
+  - id: SC03
+    place: harbor
+    timeOfDay: night, fog
+    summary: The drowned fisherman
+    shots:
+      - id: SC03-SH01
+        action: Mira skids to a stop on the wet cobbles; her lantern flame turns blue; the drowned fisherman stands waiting
+        camera: wide, low angle, fog between them
+        durationSec: 12
+        cast:
+          - id: mira
+            wardrobe: [mira-oilskin]
+          - id: fisherman
+        props: [brass-lantern]
+        status: planned

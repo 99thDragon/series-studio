@@ -3,7 +3,7 @@
 | | |
 |---|---|
 | **Owner** | 99thDragon |
-| **Status** | Draft v0.1 |
+| **Status** | Draft v0.2 (M1 and M2 foundations built) |
 | **Date** | 2026-11-01 |
 | **Audience** | Single user (personal production tool) |
 
@@ -134,26 +134,27 @@ All of this lives in **one production record**: a folder of human-readable files
 
 ```
 series/<series-slug>/
+  series.yaml                 # title, logline, format, default model adapters
   bible.md                    # world, tone, rules every episode inherits
-  look.md                     # visual language: art style, palette, lenses, aspect ratio
+  look.md                     # visual language (frontmatter: style, palette, camera, lighting, avoid, per-format rules)
   skill/                      # the show's growing skill (rules learned from corrections)
     SKILL.md
-    rules/*.md
+    rules.yaml                # proposed → adopted rules, with scope and origin
   cast/<character>/
-    character.yaml            # description, personality, voice, locked prompt fragments
-    states.yaml               # time-based states: {from: S1E3, change: "scar over left eye"}
+    character.yaml            # description, personality, voice, locked prompt fragment,
+                              #   time-based states: {from: S01E03, change: "scar over left eye"}
     refs/                     # canonical reference frames (turnaround, expressions)
-  wardrobe/<item>.yaml + refs/
-  props/<item>.yaml + refs/
-  places/<location>.yaml + refs/
+  wardrobe|props|places/<id>/
+    asset.yaml                # description, prompt fragment, usage rules (scoped by episode)
+    refs/
   voices/, music/
-  seasons/<nn>/episodes/<nn>/
+  seasons/<ss>/episodes/<ee>/
+    episode.yaml
     script.md
     shots.yaml                # scene → shot list, each linked to Bible entries
-    takes/                    # take metadata (media itself in the media store)
-    cut.yaml                  # cut manifest / decision list
+    cut.yaml                  # cut manifest / decision list (later)
   continuity.yaml             # state carried across episodes
-  ledger.jsonl                # every generation: prompt, refs, model, params, cost, verdict
+  ledger.jsonl                # every generation: prompt, refs, model, params, cost; every verdict
 ```
 
 | Entity | Key fields |

@@ -1,0 +1,24 @@
+id: mira
+name: Mira
+description: 16-year-old apprentice keeper
+personality: Stubborn, curious, hides fear with jokes.
+voice: young, dry, quick
+prompt: Mira, 16-year-old girl, short choppy black hair, grey-green eyes, freckles, small silver ring on a cord around her neck
+refs:
+  - file: refs/front.png
+    kind: turnaround
+    label: front
+    canonical: true
+  - file: refs/profile.png
+    kind: turnaround
+    label: profile
+    canonical: true
+  - file: refs/candidate-smile.png
+    kind: expression
+    label: smile (candidate)
+    canonical: false
+states:
+  - from: S01E03
+    change: thin scar across left cheekbone
+    prompt: thin pale scar across her left cheekbone
+extra: false

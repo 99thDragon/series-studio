@@ -1,0 +1,13 @@
+id: bram
+name: Bram
+description: The old keeper
+personality: Gruff, patient, sings to the lamp.
+voice: low, gravelly
+prompt: Bram, elderly man, broad shoulders, white beard braided once, heavy wool sweater, deep-set kind eyes
+refs:
+  - file: refs/front.png
+    kind: turnaround
+    label: front
+    canonical: true
+states: []
+extra: false

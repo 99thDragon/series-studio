@@ -1,0 +1,9 @@
+id: mira-winter-scarf
+name: Bram's red scarf
+description: Bram gives Mira his red scarf in S01E04
+prompt: long hand-knitted red wool scarf
+refs: []
+rules:
+  - text: Mira only wears the red scarf from S01E04 onward
+    from: S01E04
+owner: mira

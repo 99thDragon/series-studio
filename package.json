@@ -1,0 +1,22 @@
+{
+  "name": "series-studio",
+  "private": true,
+  "type": "module",
+  "packageManager": "pnpm@10.28.0",
+  "scripts": {
+    "studio": "tsx packages/cli/src/index.ts",
+    "mcp": "tsx packages/mcp/src/index.ts",
+    "server": "tsx packages/server/src/index.ts",
+    "web": "pnpm --filter @studio/web dev",
+    "dev": "concurrently -n api,web \"pnpm server\" \"pnpm web\"",
+    "test": "vitest run",
+    "typecheck": "tsc -p tsconfig.json --noEmit"
+  },
+  "devDependencies": {
+    "@types/node": "^22.10.0",
+    "concurrently": "^9.1.0",
+    "tsx": "^4.19.2",
+    "typescript": "^5.7.2",
+    "vitest": "^2.1.8"
+  }
+}

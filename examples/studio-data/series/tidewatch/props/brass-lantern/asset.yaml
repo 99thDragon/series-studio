@@ -1,0 +1,12 @@
+id: brass-lantern
+name: Brass lantern
+description: Mira's hand lantern, lit from the great lamp
+prompt: small dented brass hand lantern with amber flame
+refs:
+  - file: refs/detail.png
+    kind: detail
+    label: detail
+    canonical: true
+rules:
+  - text: the lantern flame flickers blue when the sea is remembering
+owner: mira

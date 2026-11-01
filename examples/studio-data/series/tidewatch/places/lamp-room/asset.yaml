@@ -1,0 +1,11 @@
+id: lamp-room
+name: Lamp room
+description: Glass-walled top of the lighthouse around the great lamp
+prompt: circular glass-walled lamp room atop a stone lighthouse, huge brass Fresnel lamp in the centre, storm outside the glass
+refs:
+  - file: refs/establishing.png
+    kind: establishing
+    label: establishing
+    canonical: true
+rules:
+  - text: the lamp's amber light is the key light at night
