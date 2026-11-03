@@ -28,7 +28,7 @@ def _start(key: str, fn, *args):
             jobs[key] = {"status": "done"}
         except Exception as e:  # report the real error to the UI, never invent output
             traceback.print_exc()
-            jobs[key] = {"status": "error", "error": str(e)[:400]}
+            jobs[key] = {"status": "error", "error": (str(e) or type(e).__name__)[:400]}
 
     threading.Thread(target=work, daemon=True).start()
     return {"ok": True}
@@ -87,11 +87,18 @@ def save_shots(body: list[ShotIn]):
     return {"ok": True}
 
 
+def _require_shot(shot_id: str) -> None:
+    if not any(s["id"] == shot_id for s in record.shots()):
+        raise HTTPException(404, f"No shot {shot_id}")
+
+
 @app.post("/api/shots/{shot_id}/frame")
 def make_frame(shot_id: str):
+    _require_shot(shot_id)
     return _start(f"{shot_id}:frame", render.frame, shot_id)
 
 
 @app.post("/api/shots/{shot_id}/take")
 def make_take(shot_id: str, final: bool = False):
+    _require_shot(shot_id)
     return _start(f"{shot_id}:take", render.take, shot_id, not final)
