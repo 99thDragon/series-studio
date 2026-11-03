@@ -6,7 +6,7 @@
     "frame": "media/frames/SH01-1793665924.png",
     "take": "media/takes/SH01-1793665982.mp4",
     "line": "Midnight. One last package. Then home.",
-    "voice": "media/voice/SH01-1793666619.mp3"
+    "voice": "media/voice/SH01-1793666698.mp3"
   },
   {
     "id": "SH02",
@@ -15,7 +15,7 @@
     "frame": "media/frames/SH02-1793665927.png",
     "take": "media/takes/SH02-1793665985.mp4",
     "line": "Except this one had my name on it.",
-    "voice": "media/voice/SH02-1793666621.mp3"
+    "voice": "media/voice/SH02-1793666701.mp3"
   },
   {
     "id": "SH03",
@@ -24,7 +24,7 @@
     "frame": "media/frames/SH03-1793665929.png",
     "take": "media/takes/SH03-1793665987.mp4",
     "line": "And then the whole city went dark.",
-    "voice": "media/voice/SH03-1793666623.mp3"
+    "voice": "media/voice/SH03-1793666701.mp3"
   },
   {
     "id": "SH04",
@@ -33,7 +33,7 @@
     "frame": "media/frames/SH04-1793665931.png",
     "take": "media/takes/SH04-1793665989.mp4",
     "line": "The only light left was the one in my bag.",
-    "voice": "media/voice/SH04-1793666626.mp3"
+    "voice": "media/voice/SH04-1793666701.mp3"
   },
   {
     "id": "SH05",
@@ -42,7 +42,7 @@
     "frame": "media/frames/SH05-1793665933.png",
     "take": "media/takes/SH05-1793665991.mp4",
     "line": "Deliver before midnight, it said.",
-    "voice": "media/voice/SH05-1793666628.mp3"
+    "voice": "media/voice/SH05-1793666701.mp3"
   },
   {
     "id": "SH06",
@@ -51,6 +51,6 @@
     "frame": "media/frames/SH06-1793665935.png",
     "take": "media/takes/SH06-1793665994.mp4",
     "line": "So I did.",
-    "voice": "media/voice/SH06-1793666630.mp3"
+    "voice": "media/voice/SH06-1793666701.mp3"
   }
 ]

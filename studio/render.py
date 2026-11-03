@@ -178,12 +178,13 @@ def cut() -> dict:
         part = mixdir / f"{s['id']}.mp4"
         take_path = str(record.ROOT / s["take"])
         if s.get("voice"):
-            # Lift the quiet rain ambience, lay the line in 0.3s after the cut.
+            # Voice on top: rain ducked under it (~20 dB below the line), line laid in 0.3s after the cut.
             _ffmpeg("-i", take_path, "-i", str(record.ROOT / s["voice"]), "-filter_complex",
-                    "[0:a]volume=3[a0];[1:a]adelay=300|300,volume=1.6[a1];[a0][a1]amix=inputs=2:duration=first:normalize=0[a]",
+                    "[0:a]volume=0.7[a0];[1:a]adelay=300|300,volume=2.2[a1];"
+                    "[a0][a1]amix=inputs=2:duration=first:normalize=0,alimiter=limit=0.9[a]",
                     "-map", "0:v", "-map", "[a]", "-c:v", "copy", "-c:a", "aac", "-ar", "48000", "-ac", "2", str(part))
         else:
-            _ffmpeg("-i", take_path, "-filter_complex", "[0:a]volume=3[a]",
+            _ffmpeg("-i", take_path, "-filter_complex", "[0:a]volume=0.7[a]",
                     "-map", "0:v", "-map", "[a]", "-c:v", "copy", "-c:a", "aac", "-ar", "48000", "-ac", "2", str(part))
         parts.append(part)
     manifest = dest.with_suffix(".txt")
