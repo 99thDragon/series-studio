@@ -78,6 +78,7 @@ class ShotIn(BaseModel):
     id: str
     action: str
     camera: str
+    line: str = ""
 
 
 @app.post("/api/shots")
@@ -86,8 +87,10 @@ def save_shots(body: list[ShotIn]):
     new = []
     for s in body:
         prev = old.get(s.id, {})
-        new.append({"id": s.id, "action": s.action, "camera": s.camera,
-                    "frame": prev.get("frame"), "take": prev.get("take")})
+        new.append({"id": s.id, "action": s.action, "camera": s.camera, "line": s.line,
+                    "frame": prev.get("frame"), "take": prev.get("take"),
+                    # a rewritten line needs a new reading
+                    "voice": prev.get("voice") if prev.get("line") == s.line else None})
     record.save_shots(new)
     return {"ok": True}
 
@@ -111,6 +114,12 @@ def make_take(shot_id: str, final: bool = False):
     if _running(f"{shot_id}:frame"):
         raise HTTPException(409, f"Wait for {shot_id}'s frame to finish first")
     return _start(f"{shot_id}:take", render.take, shot_id, not final)
+
+
+@app.post("/api/shots/{shot_id}/voice")
+def make_voice(shot_id: str):
+    _require_shot(shot_id)
+    return _start(f"{shot_id}:voice", render.voice, shot_id)
 
 
 @app.post("/api/cut")

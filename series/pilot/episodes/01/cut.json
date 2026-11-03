@@ -7,5 +7,13 @@
     "media/takes/SH05-1793665991.mp4",
     "media/takes/SH06-1793665994.mp4"
   ],
-  "output": "media/cuts/ep01-1793666089.mp4"
+  "voices": [
+    "media/voice/SH01-1793666619.mp3",
+    "media/voice/SH02-1793666621.mp3",
+    "media/voice/SH03-1793666623.mp3",
+    "media/voice/SH04-1793666626.mp3",
+    "media/voice/SH05-1793666628.mp3",
+    "media/voice/SH06-1793666630.mp3"
+  ],
+  "output": "media/cuts/ep01-1793666636.mp4"
 }

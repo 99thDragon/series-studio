@@ -71,6 +71,7 @@
     <div class="row" style="margin:0 0 14px">
       <button id="allFrames">Frame all shots</button>
       <button id="allTakes" class="ghost">Draft take all shots</button>
+      <button id="allVoices" class="ghost">Voice all lines</button>
       <button id="saveShots" class="ghost">Save shot list</button>
     </div>
     <div class="shots" id="shots"></div>
@@ -106,7 +107,7 @@ async function api(path, body) {
 }
 
 function collectShots() {
-  return [...document.querySelectorAll(".shot")].map(el => ({ id: el.dataset.id, action: el.querySelector("textarea").value, camera: el.querySelector("select").value }));
+  return [...document.querySelectorAll(".shot")].map(el => ({ id: el.dataset.id, action: el.querySelector("textarea").value, camera: el.querySelector("select").value, line: el.querySelector("input.line").value }));
 }
 
 function render() {
@@ -128,6 +129,8 @@ function render() {
         <div class="id">${s.id}</div>
         <textarea>${esc(s.action)}</textarea>
         <select>${S.cameras.map(cm => `<option ${cm === s.camera ? "selected" : ""}>${cm}</option>`).join("")}</select>
+        <input class="line" placeholder="Narration line (Rin's voice)" value="${esc(s.line)}">
+        ${s.voice ? `<audio src="${media(s.voice)}" controls style="width:100%;height:32px"></audio>` : ""}
         <div class="media">
           ${s.frame ? `<img src="${media(s.frame)}" alt="${s.id} frame">` : `<div class="ph">Frame</div>`}
           ${s.take ? `<video src="${media(s.take)}" controls muted loop playsinline></video>` : `<div class="ph">Take</div>`}
@@ -136,8 +139,9 @@ function render() {
           <button data-act="frame" ${job(s.id + ":frame").status === "running" ? "disabled" : ""}>Frame</button>
           <button data-act="take" class="ghost" ${!s.frame || job(s.id + ":take").status === "running" ? "disabled" : ""}>Draft take</button>
           <button data-act="final" class="ghost" ${!s.frame || job(s.id + ":take").status === "running" ? "disabled" : ""}>Final take</button>
+          <button data-act="voice" class="ghost" ${!s.line || job(s.id + ":voice").status === "running" ? "disabled" : ""}>Voice</button>
         </div>
-        <div>${statusHtml(s.id + ":frame", "Frame")} ${statusHtml(s.id + ":take", "Take")}</div>
+        <div>${statusHtml(s.id + ":frame", "Frame")} ${statusHtml(s.id + ":take", "Take")} ${statusHtml(s.id + ":voice", "Voice")}</div>
         <details><summary>Assembled prompts</summary><p><b>Frame:</b> ${esc(s.frame_prompt)}</p><p><b>Take:</b> ${esc(s.take_prompt)}</p></details>
       </div>`).join("");
   }
@@ -165,9 +169,11 @@ $("shots").addEventListener("click", async e => {
   if (b.dataset.act === "frame") api(`/api/shots/${id}/frame`);
   if (b.dataset.act === "take") api(`/api/shots/${id}/take`);
   if (b.dataset.act === "final") api(`/api/shots/${id}/take?final=true`);
+  if (b.dataset.act === "voice") api(`/api/shots/${id}/voice`);
 });
 $("allFrames").onclick = async () => { if (editing) { await api("/api/shots", collectShots()); editing = false; } for (const s of S.shots) await api(`/api/shots/${s.id}/frame`); };
 $("allTakes").onclick = async () => { for (const s of S.shots.filter(s => s.frame)) await api(`/api/shots/${s.id}/take`); };
+$("allVoices").onclick = async () => { if (editing) { await api("/api/shots", collectShots()); editing = false; } for (const s of S.shots.filter(s => s.line)) await api(`/api/shots/${s.id}/voice`); };
 $("cutBtn").onclick = () => api("/api/cut");
 $("play").onclick = () => {
   const list = S.shots.filter(s => s.take).map(s => media(s.take)); if (!list.length) return;

@@ -15,6 +15,8 @@ _client = None
 
 IMAGE_MODEL = "bfl/flux-3-image"
 VIDEO_MODEL = "bfl/flux-3-video"
+VOICE_MODEL = "elevenlabs/eleven_multilingual_v2"
+RIN_VOICE = "21m00Tcm4TlvDq8ikWAM"  # ElevenLabs stock voice ("Rachel")
 
 # Camera presets: how the still is framed, and how the video camera moves.
 CAMERA = {
@@ -139,22 +141,60 @@ def frame(shot_id: str) -> dict:
     return entry
 
 
+def voice(shot_id: str) -> dict:
+    """Narration: Rin reads the shot's line (ElevenLabs through Comfy Router)."""
+    shot = next(s for s in record.shots() if s["id"] == shot_id)
+    if not shot.get("line"):
+        raise RuntimeError(f"{shot_id} has no narration line")
+    t = time.time()
+    res = client().models.run_detailed(VOICE_MODEL, {"voice_id": RIN_VOICE, "text": shot["line"]})
+    dest = record.MEDIA / "voice" / f"{shot_id}-{int(time.time())}.mp3"
+    dest.parent.mkdir(parents=True, exist_ok=True)
+    dest.write_bytes(res.output.content)
+    out = str(dest.relative_to(record.ROOT)).replace("\\", "/")
+    record.log({"kind": "voice", "shot": shot_id, "model": VOICE_MODEL, "prompt": shot["line"], "params": {"voice_id": RIN_VOICE},
+                "refs": [], "credits": float(res.credits_used) if res.credits_used else None,
+                "seconds": round(time.time() - t, 1), "output": out})
+    record.update_shot(shot_id, voice=out)
+    return {"output": out}
+
+
+def _ffmpeg(*args: str) -> None:
+    subprocess.run(["ffmpeg", "-v", "error", "-y", *args], check=True, capture_output=True, text=True)
+
+
 def cut() -> dict:
-    """Stitch every shot's take, in shot order, into one episode MP4 (FFmpeg concat)."""
+    """Mix each take with its narration, then stitch them in shot order into one episode MP4."""
     shots = record.shots()
     missing = [s["id"] for s in shots if not s.get("take")]
     if missing:
         raise RuntimeError(f"No take yet for {', '.join(missing)}")
-    dest = record.MEDIA / "cuts" / f"ep01-{int(time.time())}.mp4"
-    dest.parent.mkdir(parents=True, exist_ok=True)
+    stamp = int(time.time())
+    dest = record.MEDIA / "cuts" / f"ep01-{stamp}.mp4"
+    mixdir = record.MEDIA / "cuts" / f"mix-{stamp}"
+    mixdir.mkdir(parents=True, exist_ok=True)
+    parts = []
+    for s in shots:
+        part = mixdir / f"{s['id']}.mp4"
+        take_path = str(record.ROOT / s["take"])
+        if s.get("voice"):
+            # Lift the quiet rain ambience, lay the line in 0.3s after the cut.
+            _ffmpeg("-i", take_path, "-i", str(record.ROOT / s["voice"]), "-filter_complex",
+                    "[0:a]volume=3[a0];[1:a]adelay=300|300,volume=1.6[a1];[a0][a1]amix=inputs=2:duration=first:normalize=0[a]",
+                    "-map", "0:v", "-map", "[a]", "-c:v", "copy", "-c:a", "aac", "-ar", "48000", "-ac", "2", str(part))
+        else:
+            _ffmpeg("-i", take_path, "-filter_complex", "[0:a]volume=3[a]",
+                    "-map", "0:v", "-map", "[a]", "-c:v", "copy", "-c:a", "aac", "-ar", "48000", "-ac", "2", str(part))
+        parts.append(part)
     manifest = dest.with_suffix(".txt")
-    manifest.write_text("".join(f"file '{(record.ROOT / s['take']).as_posix()}'\n" for s in shots), encoding="utf-8")
-    subprocess.run(["ffmpeg", "-v", "error", "-y", "-f", "concat", "-safe", "0", "-i", str(manifest), "-c", "copy", str(dest)],
-                   check=True, capture_output=True, text=True)
+    manifest.write_text("".join(f"file '{p.as_posix()}'\n" for p in parts), encoding="utf-8")
+    _ffmpeg("-f", "concat", "-safe", "0", "-i", str(manifest), "-c", "copy", str(dest))
     out = str(dest.relative_to(record.ROOT)).replace("\\", "/")
-    record.log({"kind": "cut", "shot": None, "model": "ffmpeg", "prompt": None, "params": {}, "refs": [s["take"] for s in shots],
+    used = [s["take"] for s in shots] + [s["voice"] for s in shots if s.get("voice")]
+    record.log({"kind": "cut", "shot": None, "model": "ffmpeg", "prompt": None, "params": {}, "refs": used,
                 "credits": 0, "seconds": 0, "output": out})
-    record.write_json(record.SERIES / "episodes" / "01" / "cut.json", {"takes": [s["take"] for s in shots], "output": out})
+    record.write_json(record.SERIES / "episodes" / "01" / "cut.json",
+                      {"takes": [s["take"] for s in shots], "voices": [s.get("voice") for s in shots], "output": out})
     return {"output": out}
 
 
