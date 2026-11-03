@@ -1,5 +1,6 @@
 """Prompt assembly + rendering through Comfy Router. Frames first (FLUX 3 image), then takes (FLUX 3 video, i2v)."""
 import base64
+import subprocess
 import time
 from pathlib import Path
 
@@ -136,6 +137,25 @@ def frame(shot_id: str) -> dict:
                  [ch["ref"]], dest)
     record.update_shot(shot_id, frame=entry["output"])
     return entry
+
+
+def cut() -> dict:
+    """Stitch every shot's take, in shot order, into one episode MP4 (FFmpeg concat)."""
+    shots = record.shots()
+    missing = [s["id"] for s in shots if not s.get("take")]
+    if missing:
+        raise RuntimeError(f"No take yet for {', '.join(missing)}")
+    dest = record.MEDIA / "cuts" / f"ep01-{int(time.time())}.mp4"
+    dest.parent.mkdir(parents=True, exist_ok=True)
+    manifest = dest.with_suffix(".txt")
+    manifest.write_text("".join(f"file '{(record.ROOT / s['take']).as_posix()}'\n" for s in shots), encoding="utf-8")
+    subprocess.run(["ffmpeg", "-v", "error", "-y", "-f", "concat", "-safe", "0", "-i", str(manifest), "-c", "copy", str(dest)],
+                   check=True, capture_output=True, text=True)
+    out = str(dest.relative_to(record.ROOT)).replace("\\", "/")
+    record.log({"kind": "cut", "shot": None, "model": "ffmpeg", "prompt": None, "params": {}, "refs": [s["take"] for s in shots],
+                "credits": 0, "seconds": 0, "output": out})
+    record.write_json(record.SERIES / "episodes" / "01" / "cut.json", {"takes": [s["take"] for s in shots], "output": out})
+    return {"output": out}
 
 
 def take(shot_id: str, draft: bool = True) -> dict:

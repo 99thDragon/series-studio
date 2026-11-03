@@ -77,9 +77,13 @@
   </section>
 
   <section class="panel scene">
-    <h2>Scene playback</h2>
+    <h2>Episode cut</h2>
     <video id="scene" controls playsinline></video>
-    <div class="row"><button id="play" class="ghost">Play all takes in order</button></div>
+    <div class="row">
+      <button id="cutBtn">Export episode cut</button>
+      <button id="play" class="ghost">Play all takes in order</button>
+      <span id="cutStatus"></span>
+    </div>
   </section>
 
   <section class="panel">
@@ -138,6 +142,11 @@ function render() {
       </div>`).join("");
   }
 
+  $("cutStatus").innerHTML = statusHtml("cut", "Cut");
+  $("cutBtn").disabled = takes < n || job("cut").status === "running";
+  const cutSrc = S.cut ? media(S.cut.output) : "";
+  if (cutSrc && $("scene").dataset.cut !== cutSrc) { $("scene").dataset.cut = cutSrc; $("scene").src = cutSrc; }
+
   $("ledger").innerHTML = S.ledger.map(e => `<tr><td>${esc(e.ts.slice(11))}</td><td>${esc(e.kind)}</td><td>${esc(e.shot || "")}</td><td>${esc(e.model)}</td><td>${e.credits ?? "?"}</td><td>${e.seconds}</td><td class="p">${esc(e.prompt)}</td></tr>`).join("");
 }
 
@@ -159,9 +168,10 @@ $("shots").addEventListener("click", async e => {
 });
 $("allFrames").onclick = async () => { if (editing) { await api("/api/shots", collectShots()); editing = false; } for (const s of S.shots) await api(`/api/shots/${s.id}/frame`); };
 $("allTakes").onclick = async () => { for (const s of S.shots.filter(s => s.frame)) await api(`/api/shots/${s.id}/take`); };
+$("cutBtn").onclick = () => api("/api/cut");
 $("play").onclick = () => {
   const list = S.shots.filter(s => s.take).map(s => media(s.take)); if (!list.length) return;
-  let i = 0; const v = $("scene");
+  let i = 0; const v = $("scene"); v.dataset.cut = "";
   v.onended = () => { i++; if (i < list.length) { v.src = list[i]; v.play(); } };
   v.src = list[0]; v.play();
 };

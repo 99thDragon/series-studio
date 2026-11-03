@@ -1,0 +1,11 @@
+{
+  "takes": [
+    "media/takes/SH01-1793665982.mp4",
+    "media/takes/SH02-1793665985.mp4",
+    "media/takes/SH03-1793665987.mp4",
+    "media/takes/SH04-1793665989.mp4",
+    "media/takes/SH05-1793665991.mp4",
+    "media/takes/SH06-1793665994.mp4"
+  ],
+  "output": "media/cuts/ep01-1793666089.mp4"
+}

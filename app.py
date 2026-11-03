@@ -17,8 +17,12 @@ app.mount("/media", StaticFiles(directory=record.MEDIA), name="media")
 jobs: dict[str, dict] = {}
 
 
+def _running(key: str) -> bool:
+    return jobs.get(key, {}).get("status") == "running"
+
+
 def _start(key: str, fn, *args):
-    if jobs.get(key, {}).get("status") == "running":
+    if _running(key):
         raise HTTPException(409, f"{key} is already running")
     jobs[key] = {"status": "running"}
 
@@ -53,6 +57,7 @@ def state():
         "character": record.character(),
         "shots": shots,
         "cameras": list(render.CAMERA),
+        "cut": record.read_json(record.SERIES / "episodes" / "01" / "cut.json"),
         "jobs": jobs,
         "ledger": ledger[::-1],
         "credits": round(credits, 2),
@@ -95,10 +100,19 @@ def _require_shot(shot_id: str) -> None:
 @app.post("/api/shots/{shot_id}/frame")
 def make_frame(shot_id: str):
     _require_shot(shot_id)
+    if _running("ref"):
+        raise HTTPException(409, "Wait for the reference frame to finish first")
     return _start(f"{shot_id}:frame", render.frame, shot_id)
 
 
 @app.post("/api/shots/{shot_id}/take")
 def make_take(shot_id: str, final: bool = False):
     _require_shot(shot_id)
+    if _running(f"{shot_id}:frame"):
+        raise HTTPException(409, f"Wait for {shot_id}'s frame to finish first")
     return _start(f"{shot_id}:take", render.take, shot_id, not final)
+
+
+@app.post("/api/cut")
+def make_cut():
+    return _start("cut", render.cut)

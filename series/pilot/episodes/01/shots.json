@@ -1,23 +1,44 @@
 [
   {
     "id": "SH01",
-    "action": "Rin skids her bike to a stop at a flooded crosswalk and checks the glowing package label",
+    "action": "Rin skids her bike to a stop at a flooded crosswalk at midnight and pulls a small package from her bag; the package glows soft gold through its brown paper",
     "camera": "Static wide",
-    "frame": "media/frames/SH01-1793665051.png",
-    "take": "media/takes/SH01-1793665138.mp4"
+    "frame": "media/frames/SH01-1793665924.png",
+    "take": "media/takes/SH01-1793665982.mp4"
   },
   {
     "id": "SH02",
-    "action": "Rin looks up at the rain falling through the neon signs and smiles",
+    "action": "Close on Rin's face lit gold from below as she reads the package label; her amber eyes widen in shock",
     "camera": "Dolly in",
-    "frame": "media/frames/SH02-1793665053.png",
-    "take": "media/takes/SH02-1793665140.mp4"
+    "frame": "media/frames/SH02-1793665927.png",
+    "take": "media/takes/SH02-1793665985.mp4"
   },
   {
     "id": "SH03",
-    "action": "Rin pushes off and rides away down the street, spray flying from her wheels",
+    "action": "Rin stands small in the middle of the empty street looking up as every neon sign in the city flickers and goes dark, block by block",
+    "camera": "Crane up",
+    "frame": "media/frames/SH03-1793665929.png",
+    "take": "media/takes/SH03-1793665987.mp4"
+  },
+  {
+    "id": "SH04",
+    "action": "Rin races her bike through the pitch-dark rainy streets, the only light is the gold glow from her messenger bag lighting the rain around her",
     "camera": "Handheld follow",
-    "frame": "media/frames/SH03-1793665056.png",
-    "take": "media/takes/SH03-1793665143.mp4"
+    "frame": "media/frames/SH04-1793665931.png",
+    "take": "media/takes/SH04-1793665989.mp4"
+  },
+  {
+    "id": "SH05",
+    "action": "On a rooftop in the rain, Rin kneels and opens the package; warm golden light pours out over her face and the falling raindrops",
+    "camera": "Orbit",
+    "frame": "media/frames/SH05-1793665933.png",
+    "take": "media/takes/SH05-1793665991.mp4"
+  },
+  {
+    "id": "SH06",
+    "action": "Rin stands at the rooftop edge holding the glowing light in her hands and smiles as the whole city skyline lights back up behind her",
+    "camera": "Static wide",
+    "frame": "media/frames/SH06-1793665935.png",
+    "take": "media/takes/SH06-1793665994.mp4"
   }
 ]
