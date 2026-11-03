@@ -1,0 +1,23 @@
+[
+  {
+    "id": "SH01",
+    "action": "Rin skids her bike to a stop at a flooded crosswalk and checks the glowing package label",
+    "camera": "Static wide",
+    "frame": "media/frames/SH01-1793665051.png",
+    "take": "media/takes/SH01-1793665138.mp4"
+  },
+  {
+    "id": "SH02",
+    "action": "Rin looks up at the rain falling through the neon signs and smiles",
+    "camera": "Dolly in",
+    "frame": "media/frames/SH02-1793665053.png",
+    "take": "media/takes/SH02-1793665140.mp4"
+  },
+  {
+    "id": "SH03",
+    "action": "Rin pushes off and rides away down the street, spray flying from her wheels",
+    "camera": "Handheld follow",
+    "frame": "media/frames/SH03-1793665056.png",
+    "take": "media/takes/SH03-1793665143.mp4"
+  }
+]

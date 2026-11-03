@@ -1,0 +1,172 @@
+<!doctype html>
+<html lang="en">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<title>Series Studio</title>
+<style>
+  :root { --bg:#14121a; --panel:#1e1b26; --line:#2e2a3a; --text:#ece9f3; --dim:#9a94aa; --acc:#f5e14a; --ok:#5fd38d; --err:#ff6b6b; }
+  * { box-sizing:border-box; }
+  body { margin:0; background:var(--bg); color:var(--text); font:14px/1.5 system-ui, sans-serif; }
+  header { display:flex; flex-wrap:wrap; gap:16px; align-items:center; justify-content:space-between; padding:16px 24px; border-bottom:1px solid var(--line); }
+  h1 { margin:0; font-size:20px; } h1 span { color:var(--acc); }
+  h2 { font-size:13px; letter-spacing:.08em; text-transform:uppercase; color:var(--dim); margin:0 0 12px; }
+  main { max-width:1200px; margin:0 auto; padding:20px 16px 60px; display:grid; gap:20px; }
+  .panel { background:var(--panel); border:1px solid var(--line); border-radius:14px; padding:18px; }
+  .pipe { display:flex; gap:6px; flex-wrap:wrap; }
+  .step { padding:4px 10px; border-radius:99px; border:1px solid var(--line); color:var(--dim); font-size:12px; }
+  .step.done { border-color:var(--ok); color:var(--ok); }
+  .spend { font-variant-numeric:tabular-nums; color:var(--dim); } .spend b { color:var(--acc); }
+  .char { display:grid; grid-template-columns:200px 1fr; gap:18px; }
+  .char img, .ph { width:200px; aspect-ratio:3/4; object-fit:cover; border-radius:10px; background:#0d0c12; border:1px solid var(--line); }
+  .ph { display:grid; place-items:center; color:var(--dim); font-size:12px; text-align:center; padding:8px; }
+  textarea, input, select { width:100%; background:#0d0c12; color:var(--text); border:1px solid var(--line); border-radius:8px; padding:8px 10px; font:inherit; }
+  textarea { min-height:90px; resize:vertical; }
+  button { background:var(--acc); color:#14121a; border:0; border-radius:8px; padding:8px 14px; font-weight:600; cursor:pointer; }
+  button.ghost { background:transparent; color:var(--text); border:1px solid var(--line); }
+  button:disabled { opacity:.45; cursor:not-allowed; }
+  .row { display:flex; gap:8px; flex-wrap:wrap; align-items:center; margin-top:10px; }
+  .shots { display:grid; gap:16px; grid-template-columns:repeat(auto-fill, minmax(330px, 1fr)); }
+  .shot { background:#18151f; border:1px solid var(--line); border-radius:12px; padding:14px; display:grid; gap:10px; }
+  .shot .id { font-weight:700; color:var(--acc); }
+  .media { display:grid; grid-template-columns:1fr 1fr; gap:8px; }
+  .media img, .media video, .media .ph { width:100%; aspect-ratio:16/9; object-fit:cover; border-radius:8px; }
+  .status { font-size:12px; color:var(--dim); min-height:18px; }
+  .status.running { color:var(--acc); } .status.error { color:var(--err); }
+  details summary { cursor:pointer; color:var(--dim); font-size:12px; }
+  details p { font-size:12px; color:var(--dim); margin:6px 0 0; }
+  table { width:100%; border-collapse:collapse; font-size:12px; }
+  th, td { text-align:left; padding:6px 8px; border-bottom:1px solid var(--line); vertical-align:top; }
+  th { color:var(--dim); font-weight:500; }
+  td.p { max-width:420px; color:var(--dim); }
+  .scene video { width:100%; max-height:520px; background:#000; border-radius:10px; }
+  @media (max-width:640px) { .char { grid-template-columns:1fr; } .char img, .ph { width:100%; } header { padding:12px 16px; } }
+</style>
+</head>
+<body>
+<header>
+  <h1>Series Studio <span>· Last Delivery, EP01</span></h1>
+  <div class="pipe" id="pipe"></div>
+  <div class="spend" id="spend"></div>
+</header>
+<main>
+  <section class="panel">
+    <h2>Cast · reference frame</h2>
+    <div class="char">
+      <div id="refBox"></div>
+      <div>
+        <label class="status">Rin's locked prompt fragment (goes into every shot)</label>
+        <textarea id="locked"></textarea>
+        <div class="row">
+          <button id="refBtn">Generate reference frame</button>
+          <span class="status" id="refStatus"></span>
+        </div>
+        <details><summary>Bible and look</summary><p id="bible" style="white-space:pre-wrap"></p><p id="look"></p></details>
+      </div>
+    </div>
+  </section>
+
+  <section class="panel">
+    <h2>Shots · frames first, then video</h2>
+    <div class="row" style="margin:0 0 14px">
+      <button id="allFrames">Frame all shots</button>
+      <button id="allTakes" class="ghost">Draft take all shots</button>
+      <button id="saveShots" class="ghost">Save shot list</button>
+    </div>
+    <div class="shots" id="shots"></div>
+  </section>
+
+  <section class="panel scene">
+    <h2>Scene playback</h2>
+    <video id="scene" controls playsinline></video>
+    <div class="row"><button id="play" class="ghost">Play all takes in order</button></div>
+  </section>
+
+  <section class="panel">
+    <h2>Ledger · every generation, its prompt and cost</h2>
+    <div style="overflow-x:auto"><table><thead><tr><th>Time</th><th>Kind</th><th>Shot</th><th>Model</th><th>Credits</th><th>Secs</th><th>Prompt</th></tr></thead><tbody id="ledger"></tbody></table></div>
+  </section>
+</main>
+<script>
+let S = null, editing = false;
+const $ = id => document.getElementById(id);
+const esc = s => String(s ?? "").replace(/[&<>"]/g, c => ({"&":"&amp;","<":"&lt;",">":"&gt;",'"':"&quot;"}[c]));
+const media = p => p ? "/" + p.replace(/^media\//, "media/") : null;
+const job = k => S.jobs[k] || {};
+const statusHtml = (k, label) => { const j = job(k); if (!j.status) return ""; return `<span class="status ${j.status}">${label}: ${j.status === "error" ? esc(j.error) : j.status}</span>`; };
+
+async function api(path, body) {
+  const r = await fetch(path, {method:"POST", headers:{"Content-Type":"application/json"}, body: body ? JSON.stringify(body) : undefined});
+  if (!r.ok) alert((await r.json()).detail || r.statusText);
+  load();
+}
+
+function collectShots() {
+  return [...document.querySelectorAll(".shot")].map(el => ({ id: el.dataset.id, action: el.querySelector("textarea").value, camera: el.querySelector("select").value }));
+}
+
+function render() {
+  const c = S.character;
+  if (document.activeElement !== $("locked")) $("locked").value = c.locked || "";
+  $("refBox").innerHTML = c.ref ? `<img src="${media(c.ref)}" alt="Rin reference">` : `<div class="ph">No reference yet</div>`;
+  $("refStatus").innerHTML = statusHtml("ref", "Reference");
+  $("refBtn").disabled = job("ref").status === "running";
+  $("bible").textContent = S.bible; $("look").textContent = "Look: " + S.look;
+
+  const frames = S.shots.filter(s => s.frame).length, takes = S.shots.filter(s => s.take).length, n = S.shots.length;
+  const steps = [["Cast", !!c.ref], [`Frames ${frames}/${n}`, frames === n], [`Takes ${takes}/${n}`, takes === n]];
+  $("pipe").innerHTML = steps.map(([l, d]) => `<span class="step ${d ? "done" : ""}">${l}</span>`).join("");
+  $("spend").innerHTML = `Spent <b>${S.credits}</b> credits (~$${S.usd}) · ${S.ledger.length} generations`;
+
+  if (!editing) {
+    $("shots").innerHTML = S.shots.map(s => `
+      <div class="shot" data-id="${s.id}">
+        <div class="id">${s.id}</div>
+        <textarea>${esc(s.action)}</textarea>
+        <select>${S.cameras.map(cm => `<option ${cm === s.camera ? "selected" : ""}>${cm}</option>`).join("")}</select>
+        <div class="media">
+          ${s.frame ? `<img src="${media(s.frame)}" alt="${s.id} frame">` : `<div class="ph">Frame</div>`}
+          ${s.take ? `<video src="${media(s.take)}" controls muted loop playsinline></video>` : `<div class="ph">Take</div>`}
+        </div>
+        <div class="row" style="margin:0">
+          <button data-act="frame" ${job(s.id + ":frame").status === "running" ? "disabled" : ""}>Frame</button>
+          <button data-act="take" class="ghost" ${!s.frame || job(s.id + ":take").status === "running" ? "disabled" : ""}>Draft take</button>
+          <button data-act="final" class="ghost" ${!s.frame || job(s.id + ":take").status === "running" ? "disabled" : ""}>Final take</button>
+        </div>
+        <div>${statusHtml(s.id + ":frame", "Frame")} ${statusHtml(s.id + ":take", "Take")}</div>
+        <details><summary>Assembled prompts</summary><p><b>Frame:</b> ${esc(s.frame_prompt)}</p><p><b>Take:</b> ${esc(s.take_prompt)}</p></details>
+      </div>`).join("");
+  }
+
+  $("ledger").innerHTML = S.ledger.map(e => `<tr><td>${esc(e.ts.slice(11))}</td><td>${esc(e.kind)}</td><td>${esc(e.shot || "")}</td><td>${esc(e.model)}</td><td>${e.credits ?? "?"}</td><td>${e.seconds}</td><td class="p">${esc(e.prompt)}</td></tr>`).join("");
+}
+
+async function load() {
+  S = await (await fetch("/api/state")).json();
+  render();
+}
+
+$("refBtn").onclick = () => api("/api/reference", { locked: $("locked").value });
+$("saveShots").onclick = async () => { await api("/api/shots", collectShots()); editing = false; load(); };
+$("shots").addEventListener("input", () => { editing = true; });
+$("shots").addEventListener("click", async e => {
+  const b = e.target.closest("button"); if (!b) return;
+  const id = b.closest(".shot").dataset.id;
+  if (editing) { await api("/api/shots", collectShots()); editing = false; }
+  if (b.dataset.act === "frame") api(`/api/shots/${id}/frame`);
+  if (b.dataset.act === "take") api(`/api/shots/${id}/take`);
+  if (b.dataset.act === "final") api(`/api/shots/${id}/take?final=true`);
+});
+$("allFrames").onclick = async () => { if (editing) { await api("/api/shots", collectShots()); editing = false; } for (const s of S.shots) await api(`/api/shots/${s.id}/frame`); };
+$("allTakes").onclick = async () => { for (const s of S.shots.filter(s => s.frame)) await api(`/api/shots/${s.id}/take`); };
+$("play").onclick = () => {
+  const list = S.shots.filter(s => s.take).map(s => media(s.take)); if (!list.length) return;
+  let i = 0; const v = $("scene");
+  v.onended = () => { i++; if (i < list.length) { v.src = list[i]; v.play(); } };
+  v.src = list[0]; v.play();
+};
+load();
+setInterval(() => { if (Object.values(S?.jobs || {}).some(j => j.status === "running")) load(); }, 3000);
+</script>
+</body>
+</html>
